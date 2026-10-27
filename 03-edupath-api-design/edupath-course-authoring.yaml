@@ -1,0 +1,205 @@
+openapi: "3.0.1"
+info:
+  version: 1.0.0 | 26.09.2026
+  title: EduPath — Управление курсами
+  description: API для создания курса и наполнения его уроками и материалами преподавателем
+security:
+  - BearerAuth: []
+servers:
+  - url: /api/v1
+tags:
+  - name: courses operations
+    description: Создание курса, уроков и материалов
+paths:
+  /courses:
+    post:
+      tags:
+        - courses operations
+      operationId: CreateCourse
+      summary: Создать курс
+      description: Метод создает курс в статусе черновика
+      parameters:
+        - $ref: '#/components/parameters/idempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CourseRq'
+      responses:
+        201:
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseRp'
+        400:
+          description: Bad Request
+        401:
+          description: Unauthorized
+        403:
+          description: Forbidden
+        500:
+          description: Internal Service Error
+
+  /courses/{courseId}/materials:
+    post:
+      tags:
+        - courses operations
+      operationId: CreateMaterial
+      summary: Получить ссылку для загрузки материала
+      description: Метод регистрирует файл и возвращает временную ссылку для загрузки в хранилище
+      parameters:
+        - $ref: '#/components/parameters/courseId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MaterialRq'
+      responses:
+        201:
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MaterialRp'
+        400:
+          description: Bad Request
+        401:
+          description: Unauthorized
+        403:
+          description: Forbidden
+        404:
+          description: Not Found
+        500:
+          description: Internal Service Error
+
+  /courses/{courseId}/lessons:
+    post:
+      tags:
+        - courses operations
+      operationId: CreateLesson
+      summary: Добавить урок
+      description: Метод добавляет урок в курс
+      parameters:
+        - $ref: '#/components/parameters/courseId'
+        - $ref: '#/components/parameters/idempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LessonRq'
+      responses:
+        201:
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LessonRp'
+        400:
+          description: Bad Request
+        401:
+          description: Unauthorized
+        403:
+          description: Forbidden
+        404:
+          description: Not Found
+        500:
+          description: Internal Service Error
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+  parameters:
+    courseId:
+      name: courseId
+      in: path
+      description: Идентификатор курса
+      required: true
+      schema:
+        type: string
+        format: uuid
+    idempotencyKey:
+      name: Idempotency-Key
+      in: header
+      description: Ключ для защиты от повторной отправки
+      required: true
+      schema:
+        type: string
+  schemas:
+    CourseRp:
+      type: object
+      properties:
+        courseId:
+          type: string
+          format: uuid
+        status:
+          type: string
+          description: Статус курса (DRAFT - черновик)
+    CourseRq:
+      type: object
+      required:
+        - title
+      properties:
+        title:
+          type: string
+          description: Название курса
+        description:
+          type: string
+          description: Описание курса
+        category:
+          type: string
+          description: Категория
+    LessonRp:
+      type: object
+      properties:
+        lessonId:
+          type: string
+          format: uuid
+        orderNumber:
+          type: integer
+    LessonRq:
+      type: object
+      required:
+        - title
+      properties:
+        title:
+          type: string
+          description: Название урока
+        orderNumber:
+          type: integer
+          description: Порядковый номер
+        content:
+          type: string
+          description: Текст урока
+        materialIds:
+          type: array
+          items:
+            type: string
+    MaterialRp:
+      type: object
+      properties:
+        materialId:
+          type: string
+          format: uuid
+        uploadUrl:
+          type: string
+          description: Ссылка для загрузки
+    MaterialRq:
+      type: object
+      required:
+        - fileName
+      properties:
+        fileName:
+          type: string
+          description: Имя файла
+        contentType:
+          type: string
+          description: Тип файла
+        size:
+          type: integer
+          description: Размер в байтах

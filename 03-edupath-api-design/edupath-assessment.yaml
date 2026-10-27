@@ -1,0 +1,242 @@
+openapi: "3.0.1"
+info:
+  version: 1.0.0 | 02.10.2026
+  title: EduPath — Тестирование
+  description: |
+    API функциональной зоны «Тестирование»: прохождение студентом итогового теста курса.
+    Зона запускает попытку, проверяет ответы, считает балл и хранит результат.
+    Создание курсов, уроков и материалов в границы зоны не входит.
+security:
+  - BearerAuth: []
+servers:
+  - url: /api/v1
+  - url: https://{Host}/{EnvironmentPrefix}{MicroserviceName}/api/v1
+    variables:
+        Host:
+          default: edupath.ru
+          description: Host на котором развернут сервис
+        EnvironmentPrefix:
+          default: ''
+          description: Префикс тестового стенда
+        MicroserviceName:
+          default: assessment
+          description: Имя под которым сервис развернут в кластере
+tags:
+  - name: attempts operations
+    description: Попытки прохождения итогового теста и их результаты
+paths:
+  /tests/{testId}/attempts:
+    post:
+      tags:
+        - attempts operations
+      operationId: CreateAttempt
+      summary: Начать попытку прохождения теста
+      description: Метод создает попытку прохождения итогового теста и возвращает список вопросов без правильных ответов
+      parameters:
+        - $ref: '#/components/parameters/testId'
+      responses:
+        201:
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttemptRp'
+        400:
+          description: Bad Request
+        401:
+          description: Unauthorized
+        403:
+          description: Forbidden
+        404:
+          description: Not Found
+        500:
+          description: Internal Service Error
+
+  /attempts/{attemptId}/submit:
+    post:
+      tags:
+        - attempts operations
+      operationId: SubmitAttempt
+      summary: Отправить ответы на проверку
+      description: Метод принимает ответы студента по попытке, проверяет их, рассчитывает балл и возвращает результат теста
+      parameters:
+        - $ref: '#/components/parameters/attemptId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnswersRq'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TestResultRp'
+        400:
+          description: Bad Request
+        401:
+          description: Unauthorized
+        404:
+          description: Not Found
+        409:
+          description: Conflict
+        500:
+          description: Internal Service Error
+
+  /attempts/{attemptId}/result:
+    get:
+      tags:
+        - attempts operations
+      operationId: GetAttemptResult
+      summary: Получить результат попытки
+      description: Метод возвращает сохраненный результат завершенной попытки
+      parameters:
+        - $ref: '#/components/parameters/attemptId'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TestResultRp'
+        401:
+          description: Unauthorized
+        404:
+          description: Not Found
+        500:
+          description: Internal Service Error
+
+components:
+  securitySchemes:
+      BearerAuth:
+          type: http
+          scheme: bearer
+          bearerFormat: JWT
+  parameters:
+    testId:
+      name: testId
+      in: path
+      description: Уникальный идентификатор итогового теста
+      required: true
+      schema:
+        type: string
+        format: uuid
+    attemptId:
+      name: attemptId
+      in: path
+      description: Уникальный идентификатор попытки
+      required: true
+      schema:
+        type: string
+        format: uuid
+  schemas:
+    Option:
+      type: object
+      description: Вариант ответа на вопрос
+      required:
+        - optionId
+        - text
+      properties:
+        optionId:
+          type: string
+          format: uuid
+          description: Уникальный идентификатор варианта ответа
+        text:
+          type: string
+          description: Текст варианта ответа
+    Question:
+      type: object
+      description: Вопрос теста без правильного ответа
+      required:
+        - questionId
+        - text
+      properties:
+        questionId:
+          type: string
+          format: uuid
+          description: Уникальный идентификатор вопроса
+        text:
+          type: string
+          description: Текст вопроса
+        options:
+          type: array
+          description: Варианты ответа на вопрос
+          items:
+            $ref: '#/components/schemas/Option'
+    Answer:
+      type: object
+      description: Ответ студента на один вопрос
+      required:
+        - questionId
+        - optionId
+      properties:
+        questionId:
+          type: string
+          format: uuid
+          description: Уникальный идентификатор вопроса
+        optionId:
+          type: string
+          format: uuid
+          description: Уникальный идентификатор выбранного варианта ответа
+    AttemptRp:
+      type: object
+      description: Созданная попытка прохождения теста
+      required:
+        - attemptId
+      properties:
+        attemptId:
+          type: string
+          format: uuid
+          description: Уникальный идентификатор попытки
+        testId:
+          type: string
+          format: uuid
+          description: Уникальный идентификатор теста
+        attemptNumber:
+          type: integer
+          description: Порядковый номер попытки студента по этому тесту
+        questions:
+          type: array
+          description: Вопросы теста без правильных ответов
+          items:
+            $ref: '#/components/schemas/Question'
+    AnswersRq:
+      type: object
+      description: Ответы студента, отправляемые на проверку
+      required:
+        - answers
+      properties:
+        answers:
+          type: array
+          description: Список ответов на вопросы теста
+          items:
+            $ref: '#/components/schemas/Answer'
+    TestResultRp:
+      type: object
+      description: Результат прохождения итогового теста
+      required:
+        - attemptId
+        - passed
+      properties:
+        attemptId:
+          type: string
+          format: uuid
+          description: Уникальный идентификатор попытки
+        score:
+          type: integer
+          description: Количество правильных ответов
+        maxScore:
+          type: integer
+          description: Количество вопросов в тесте
+        percent:
+          type: number
+          description: Процент правильных ответов
+        passed:
+          type: boolean
+          description: Признак того, что тест сдан
+        submittedAt:
+          type: string
+          format: date-time
+          description: Дата и время отправки ответов
