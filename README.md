@@ -2,7 +2,7 @@
 
 4th-year Business Informatics student at Novosibirsk State University, applying for Junior Business Analyst / Junior Product Analyst roles.
 
-This repository contains my practical work from the course **"Business and Systems Analysis"** (May–October 2026): process models, API design, architecture and requirements artifacts. Course materials, lecture notes and test answers are not included.
+This repository contains my practical work from the **Business & Systems Analysis course by BCS at NSU** (May–October 2026): process models, API design, architecture and requirements artifacts. Course materials, lecture notes and test answers are not included.
 
 Documents are in Russian; each folder has a short English summary.
 
@@ -27,3 +27,5 @@ Documents are in Russian; each folder has a short English summary.
 ## Contact
 
 - Email: alisa.solodovnik@gmail.com
+- LinkedIn: [linkedin.com/in/alisa-solodovnik-77796b446](https://www.linkedin.com/in/alisa-solodovnik-77796b446)
+- Telegram: [@defnotalissa](https://t.me/defnotalissa)
