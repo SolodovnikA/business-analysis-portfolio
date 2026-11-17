@@ -2,7 +2,7 @@
 
 4th-year Business Informatics student at Novosibirsk State University, applying for Junior Business Analyst / Junior Product Analyst roles.
 
-This repository contains my practical work from the **Business & Systems Analysis course by BCS at NSU** (May–October 2026): process models, API design, architecture and requirements artifacts. Course materials, lecture notes and test answers are not included.
+This repository contains my practical work from the **Business & Systems Analysis course by BCS at NSU** (May–October 2026): process models, API design, architecture and requirements artifacts. Project 07 is from the «IT Business Analysis» course. Course materials, lecture notes and test answers are not included.
 
 Documents are in Russian; each folder has a short English summary.
 
@@ -16,10 +16,12 @@ Documents are in Russian; each folder has a short English summary.
 | 04 | [EduPath: architecture kata (team of 6)](04-edupath-architecture-kata/) | Architecture analysis, business operations, C4 context diagram | Modular monolith chosen and justified against 6 criteria |
 | 05 | [Communication matrix](05-communication-matrix/) | Excel | Matrix for a fictional fintech data department |
 | 06 | [User story brief](06-user-story-brief/) | Structured brief, process context | Brief for a remote investment account closure feature |
+| 07 | [UML practicum](07-uml-practicum/) | Use case, package, sequence and communication diagrams | Online cinema subscriptions and support ticket escalation, every modelling decision justified |
 
 ## Tools and methods
 
 - **Process modeling:** BPMN 2.0, Camunda Modeler, bpmn.io, SIPOC
+- **UML:** use case, package, sequence and communication diagrams, PlantUML
 - **Systems analysis:** C4 model, REST, OpenAPI 3.0 / Swagger Editor
 - **Requirements:** business requirements, user stories (INVEST, MoSCoW), Given–When–Then acceptance criteria, use cases, traceability matrix
 - **Office:** Excel, Word
